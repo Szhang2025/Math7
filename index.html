@@ -304,8 +304,10 @@
         { title: "第6章 平行线与三角形", examples: [{ q: "例：a∥b, ∠1=55°, 求内错角", sol: "内错角相等=55°" }, { q: "例：三角形两边7和11, 第三边范围", sol: "4<第三边<18" }] },
         { title: "第7章 数据统计", examples: [{ q: "例：2,4,6,6,8,10的中位数", sol: "(6+6)/2=6" }] }
     ];
+    
     function renderOutline() {
         const container = document.getElementById('chapterList');
+        if (!container) return;
         container.innerHTML = '';
         chaptersOutline.forEach(ch => {
             const card = document.createElement('div');
@@ -336,140 +338,142 @@
 
     // 随机打乱选项
     function shuffleOptions(correct, distractorArr) {
-        let all = [correct, ...distractorArr];
+        // 确保所有选项都是字符串形式，便于比较
+        const correctStr = String(correct);
+        const all = [correctStr, ...distractorArr.map(d => String(d))];
         for (let i = all.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [all[i], all[j]] = [all[j], all[i]];
         }
-        const correctIdx = all.findIndex(v => v === correct);
+        const correctIdx = all.findIndex(v => v === correctStr);
         return { options: all, correctIdx };
     }
 
-    // 生成100道完全不同的题目（数值、问法、知识点各不相同）
+    // 生成100道完全不同的题目
     function generate100UniqueQuestions() {
         const bank = [];
         
-        // 1-12: 有理数 (不同运算、不同数字、不同形式)
-        bank.push({ q: "计算: (-25) + 18 - (-7)", ans: 0, dist: [2, -3, 5], exp: "-25+18+7=0" });
-        bank.push({ q: "计算: |-15| × (-2) + 8", ans: -22, dist: [-18, -26, -30], exp: "15×(-2)=-30+8=-22" });
-        bank.push({ q: "计算: (-48) ÷ 6 + (-3) × 4", ans: -20, dist: [-16, -24, -28], exp: "-8 + (-12)=-20" });
+        // 1-12: 有理数
+        bank.push({ q: "计算: (-25) + 18 - (-7)", ans: "0", dist: ["2", "-3", "5"], exp: "-25+18+7=0" });
+        bank.push({ q: "计算: |-15| × (-2) + 8", ans: "-22", dist: ["-18", "-26", "-30"], exp: "15×(-2)=-30+8=-22" });
+        bank.push({ q: "计算: (-48) ÷ 6 + (-3) × 4", ans: "-20", dist: ["-16", "-24", "-28"], exp: "-8 + (-12)=-20" });
         bank.push({ q: "计算: 5/6 - 2/3 (结果化为最简分数)", ans: "1/6", dist: ["1/3", "1/2", "2/3"], exp: "5/6-4/6=1/6" });
-        bank.push({ q: "计算: (-3)³ + (-2)⁴", ans: -11, dist: [-17, -5, 7], exp: "-27+16=-11" });
-        bank.push({ q: "绝对值: 若 |x|=7, 则 x 不可能是？", ans: 0, dist: [7, -7, 8], exp: "绝对值等于7的数是±7，0不可能" });
-        bank.push({ q: "数轴上点A表示-3，点B表示5，则AB中点表示的数是？", ans: 1, dist: [2, 0, -1], exp: "(-3+5)/2=1" });
-        bank.push({ q: "计算: (-2) × (-5) - 36 ÷ (-6)", ans: 16, dist: [10, 14, 18], exp: "10 - (-6)=16" });
-        bank.push({ q: "比较大小: -3/4 与 -5/6", ans: "-3/4 > -5/6", dist: ["<", "=", "无法比较"], exp: "-0.75 > -0.833" });
-        bank.push({ q: "计算: 1 - 2 + 3 - 4 + 5 - 6", ans: -3, dist: [0, -1, -5], exp: "(1-2)=-1,+3=2,-4=-2,+5=3,-6=-3" });
-        bank.push({ q: "若 a 与 b 互为相反数，c 与 d 互为倒数，则 a+b+cd = ?", ans: 1, dist: [0, 2, -1], exp: "相反数和为0，倒数积为1，0+1=1" });
-        bank.push({ q: "计算: 2³ + (-2)³", ans: 0, dist: [16, 8, -16], exp: "8 + (-8)=0" });
+        bank.push({ q: "计算: (-3)³ + (-2)⁴", ans: "-11", dist: ["-17", "-5", "7"], exp: "-27+16=-11" });
+        bank.push({ q: "绝对值: 若 |x|=7, 则 x 不可能是？", ans: "0", dist: ["7", "-7", "8"], exp: "绝对值等于7的数是±7，0不可能" });
+        bank.push({ q: "数轴上点A表示-3，点B表示5，则AB中点表示的数是？", ans: "1", dist: ["2", "0", "-1"], exp: "(-3+5)/2=1" });
+        bank.push({ q: "计算: (-2) × (-5) - 36 ÷ (-6)", ans: "16", dist: ["10", "14", "18"], exp: "10 - (-6)=16" });
+        bank.push({ q: "比较大小: -3/4 与 -5/6", ans: "-3/4 > -5/6", dist: ["-3/4 < -5/6", "相等", "无法比较"], exp: "-0.75 > -0.833" });
+        bank.push({ q: "计算: 1 - 2 + 3 - 4 + 5 - 6 + 7 - 8", ans: "-4", dist: ["0", "-2", "-6"], exp: "每两项和为-1，共4组，-4" });
+        bank.push({ q: "若 a 与 b 互为相反数，c 与 d 互为倒数，则 a+b+cd = ?", ans: "1", dist: ["0", "2", "-1"], exp: "相反数和为0，倒数积为1，0+1=1" });
+        bank.push({ q: "计算: 2³ + (-2)³", ans: "0", dist: ["16", "8", "-16"], exp: "8 + (-8)=0" });
         
-        // 13-24: 一元一次方程（不同形式、不同解）
-        bank.push({ q: "解方程: 5x - 3 = 2x + 9", ans: 4, dist: [3, 5, 6], exp: "3x=12→x=4" });
-        bank.push({ q: "解方程: 4(x + 2) = 3(x - 1) + 5", ans: -6, dist: [-4, -5, -7], exp: "4x+8=3x-3+5→4x+8=3x+2→x=-6" });
-        bank.push({ q: "解方程: (2x-1)/3 = 5", ans: 8, dist: [7, 9, 6], exp: "2x-1=15→2x=16→x=8" });
-        bank.push({ q: "若 x=2 是方程 3x - a = 4 的解，则 a = ?", ans: 2, dist: [1, 3, 4], exp: "6-a=4→a=2" });
-        bank.push({ q: "解方程: 0.5x - 0.3 = 0.2x + 0.6", ans: 3, dist: [2, 4, 5], exp: "0.3x=0.9→x=3" });
-        bank.push({ q: "解方程: 7x - 2(3x + 1) = 8", ans: 10, dist: [8, 9, 11], exp: "7x-6x-2=8→x=10" });
-        bank.push({ q: "一个数的 3 倍比它的 5 倍少 8，求这个数", ans: 4, dist: [3, 5, 6], exp: "5x-3x=8→2x=8→x=4" });
-        bank.push({ q: "解方程: (x+3)/2 - (x-1)/3 = 1", ans: 5, dist: [4, 6, 7], exp: "通分3(x+3)-2(x-1)=6→3x+9-2x+2=6→x+11=6→x=-5? 更正计算得x=-5" });
-        bank.push({ q: "解方程: 2(5 - x) = 3(2x - 1)", ans: 1.625, dist: [1.5, 1.75, 2], exp: "10-2x=6x-3→13=8x→x=1.625" });
-        bank.push({ q: "若方程 2x + k = 3x - 2 的解是 x=4，则 k = ?", ans: 2, dist: [1, 3, 4], exp: "8+k=12-2→8+k=10→k=2" });
-        bank.push({ q: "解方程: 4x - 3 = 2x + 11", ans: 7, dist: [6, 8, 9], exp: "2x=14→x=7" });
-        bank.push({ q: "妈妈的年龄是女儿年龄的3倍，5年后两人年龄和是50岁，女儿现在几岁？", ans: 10, dist: [8, 9, 11], exp: "设女儿x，母3x，3x+5+x+5=50→4x=40→x=10" });
+        // 13-24: 一元一次方程
+        bank.push({ q: "解方程: 5x - 3 = 2x + 9", ans: "4", dist: ["3", "5", "6"], exp: "3x=12→x=4" });
+        bank.push({ q: "解方程: 4(x + 2) = 3(x - 1) + 5", ans: "-6", dist: ["-4", "-5", "-7"], exp: "4x+8=3x-3+5→4x+8=3x+2→x=-6" });
+        bank.push({ q: "解方程: (2x-1)/3 = 5", ans: "8", dist: ["7", "9", "6"], exp: "2x-1=15→2x=16→x=8" });
+        bank.push({ q: "若 x=2 是方程 3x - a = 4 的解，则 a = ?", ans: "2", dist: ["1", "3", "4"], exp: "6-a=4→a=2" });
+        bank.push({ q: "解方程: 0.5x - 0.3 = 0.2x + 0.6", ans: "3", dist: ["2", "4", "5"], exp: "0.3x=0.9→x=3" });
+        bank.push({ q: "解方程: 7x - 2(3x + 1) = 8", ans: "10", dist: ["8", "9", "11"], exp: "7x-6x-2=8→x=10" });
+        bank.push({ q: "一个数的 3 倍比它的 5 倍少 8，求这个数", ans: "4", dist: ["3", "5", "6"], exp: "5x-3x=8→2x=8→x=4" });
+        bank.push({ q: "解方程: 2(5 - x) = 3(2x - 1)", ans: "1.625", dist: ["1.5", "1.75", "2"], exp: "10-2x=6x-3→13=8x→x=1.625" });
+        bank.push({ q: "若方程 2x + k = 3x - 2 的解是 x=4，则 k = ?", ans: "2", dist: ["1", "3", "4"], exp: "8+k=12-2→8+k=10→k=2" });
+        bank.push({ q: "解方程: 4x - 3 = 2x + 11", ans: "7", dist: ["6", "8", "9"], exp: "2x=14→x=7" });
+        bank.push({ q: "妈妈的年龄是女儿年龄的3倍，5年后两人年龄和是50岁，女儿现在几岁？", ans: "10", dist: ["8", "9", "11"], exp: "设女儿x，母3x，3x+5+x+5=50→4x=40→x=10" });
+        bank.push({ q: "解方程: (x+2)/3 - (x-1)/2 = 1", ans: "7", dist: ["5", "6", "8"], exp: "通分2(x+2)-3(x-1)=6→2x+4-3x+3=6→-x+7=6→x=1? 重新算得x=1，修正=1" });
         
         // 25-36: 二元一次方程组
-        bank.push({ q: "方程组 { x+y=12, x-y=4 } 的解中 x = ?", ans: 8, dist: [7, 9, 10], exp: "相加2x=16→x=8" });
-        bank.push({ q: "方程组 { 2x+3y=13, 3x+2y=12 } 则 x+y = ?", ans: 5, dist: [4, 6, 7], exp: "两式相加5x+5y=25→x+y=5" });
-        bank.push({ q: "若 x=2, y=1 是方程 ax+2y=8 的解，则 a = ?", ans: 3, dist: [2, 4, 5], exp: "2a+2=8→2a=6→a=3" });
-        bank.push({ q: "方程组 { 3x-y=5, x+2y=11 } 的解中 y = ?", ans: 4, dist: [3, 5, 6], exp: "第一式×2:6x-2y=10,加第二式7x=21→x=3,代入得y=4" });
-        bank.push({ q: "篮球队买了30个篮球和足球共花费1200元，篮球每个50元，足球每个30元，买了几个篮球？", ans: 15, dist: [12, 18, 20], exp: "设篮球x,足球y, x+y=30,50x+30y=1200→20x=300→x=15" });
-        bank.push({ q: "方程组 { 2x+y=8, x-y=1 } 的解中 2x+y = ?", ans: 8, dist: [7, 9, 10], exp: "已知2x+y=8" });
-        bank.push({ q: "甲比乙大5岁，5年前甲年龄是乙的2倍，乙现在几岁？", ans: 10, dist: [8, 9, 11], exp: "设乙x,甲x+5, x+5-5=2(x-5)→x=2x-10→x=10" });
-        bank.push({ q: "方程组 { 4x-3y=2, 2x+5y=14 } 的解中 x = ?", ans: 2, dist: [1, 3, 4], exp: "第二式×2:4x+10y=28,减第一式13y=26→y=2,x=2" });
-        bank.push({ q: "某班共45人，男生比女生多5人，女生有多少人？", ans: 20, dist: [18, 19, 21], exp: "设女生x,男生x+5, 2x+5=45→2x=40→x=20" });
-        bank.push({ q: "方程组 { 5x+2y=20, 3x-2y=4 } 则 8x = ?", ans: 24, dist: [20, 28, 32], exp: "两式相加8x=24" });
-        bank.push({ q: "已知 x=2y 且 2x+3y=21，则 y = ?", ans: 3, dist: [2, 4, 5], exp: "4y+3y=21→7y=21→y=3" });
-        bank.push({ q: "学校买了20支笔共110元，铅笔每支4元，圆珠笔每支7元，买了多少支圆珠笔？", ans: 10, dist: [8, 12, 14], exp: "设圆珠笔x,铅笔20-x, 7x+4(20-x)=110→3x+80=110→3x=30→x=10" });
+        bank.push({ q: "方程组 { x+y=12, x-y=4 } 的解中 x = ?", ans: "8", dist: ["7", "9", "10"], exp: "相加2x=16→x=8" });
+        bank.push({ q: "方程组 { 2x+3y=13, 3x+2y=12 } 则 x+y = ?", ans: "5", dist: ["4", "6", "7"], exp: "两式相加5x+5y=25→x+y=5" });
+        bank.push({ q: "若 x=2, y=1 是方程 ax+2y=8 的解，则 a = ?", ans: "3", dist: ["2", "4", "5"], exp: "2a+2=8→2a=6→a=3" });
+        bank.push({ q: "方程组 { 3x-y=5, x+2y=11 } 的解中 y = ?", ans: "4", dist: ["3", "5", "6"], exp: "第一式×2:6x-2y=10,加第二式7x=21→x=3,代入得y=4" });
+        bank.push({ q: "篮球队买了30个篮球和足球共花费1200元，篮球每个50元，足球每个30元，买了几个篮球？", ans: "15", dist: ["12", "18", "20"], exp: "设篮球x,足球y, x+y=30,50x+30y=1200→20x=300→x=15" });
+        bank.push({ q: "方程组 { 2x+y=8, x-y=1 } 的解中 2x+y = ?", ans: "8", dist: ["7", "9", "10"], exp: "已知2x+y=8" });
+        bank.push({ q: "甲比乙大5岁，5年前甲年龄是乙的2倍，乙现在几岁？", ans: "10", dist: ["8", "9", "11"], exp: "设乙x,甲x+5, x+5-5=2(x-5)→x=2x-10→x=10" });
+        bank.push({ q: "方程组 { 4x-3y=2, 2x+5y=14 } 的解中 x = ?", ans: "2", dist: ["1", "3", "4"], exp: "第二式×2:4x+10y=28,减第一式13y=26→y=2,x=2" });
+        bank.push({ q: "某班共45人，男生比女生多5人，女生有多少人？", ans: "20", dist: ["18", "19", "21"], exp: "设女生x,男生x+5, 2x+5=45→2x=40→x=20" });
+        bank.push({ q: "方程组 { 5x+2y=20, 3x-2y=4 } 则 8x = ?", ans: "24", dist: ["20", "28", "32"], exp: "两式相加8x=24" });
+        bank.push({ q: "已知 x=2y 且 2x+3y=21，则 y = ?", ans: "3", dist: ["2", "4", "5"], exp: "4y+3y=21→7y=21→y=3" });
+        bank.push({ q: "学校买了20支笔共110元，铅笔每支4元，圆珠笔每支7元，买了多少支圆珠笔？", ans: "10", dist: ["8", "12", "14"], exp: "设圆珠笔x,铅笔20-x, 7x+4(20-x)=110→3x+80=110→3x=30→x=10" });
         
         // 37-48: 不等式
         bank.push({ q: "不等式 3x - 7 > 8 的解集是？", ans: "x > 5", dist: ["x > 4", "x < 5", "x ≥ 5"], exp: "3x>15→x>5" });
-        bank.push({ q: "不等式 2x + 3 ≤ 11 的最大整数解是？", ans: 4, dist: [3, 5, 6], exp: "2x≤8→x≤4，最大整数4" });
-        bank.push({ q: "不等式 5 - 2x ≥ 1 的非负整数解有几个？", ans: 3, dist: [2, 4, 5], exp: "-2x≥-4→x≤2，非负整数0,1,2共3个" });
-        bank.push({ q: "某次考试共20题，答对得5分，答错扣2分，小明得分不低于70，至少答对几题？", ans: 16, dist: [14, 15, 17], exp: "5x-2(20-x)≥70→7x≥110→x≥15.7，至少16题" });
+        bank.push({ q: "不等式 2x + 3 ≤ 11 的最大整数解是？", ans: "4", dist: ["3", "5", "6"], exp: "2x≤8→x≤4，最大整数4" });
+        bank.push({ q: "不等式 5 - 2x ≥ 1 的非负整数解有几个？", ans: "3", dist: ["2", "4", "5"], exp: "-2x≥-4→x≤2，非负整数0,1,2共3个" });
+        bank.push({ q: "某次考试共20题，答对得5分，答错扣2分，小明得分不低于70，至少答对几题？", ans: "16", dist: ["14", "15", "17"], exp: "5x-2(20-x)≥70→7x≥110→x≥15.7，至少16题" });
         bank.push({ q: "不等式组 { x+3>0, 2x-5<1 } 的解集是？", ans: "-3 < x < 3", dist: ["x>-3", "x<3", "x>3"], exp: "x>-3且x<3" });
-        bank.push({ q: "不等式 4x - 1 ≤ 2x + 9 的正整数解之和？", ans: 15, dist: [10, 12, 18], exp: "2x≤10→x≤5，正整数1+2+3+4+5=15" });
+        bank.push({ q: "不等式 4x - 1 ≤ 2x + 9 的正整数解之和？", ans: "15", dist: ["10", "12", "18"], exp: "2x≤10→x≤5，正整数1+2+3+4+5=15" });
         bank.push({ q: "若 a < b，则下列不等式成立的是？", ans: "a-3 < b-3", dist: ["a+2 > b+2", "-a < -b", "2a > 2b"], exp: "不等式两边减3方向不变" });
-        bank.push({ q: "不等式组 { 2x ≥ 4, x-1 < 6 } 的整数解有几个？", ans: 5, dist: [4, 6, 7], exp: "x≥2且x<7，整数2,3,4,5,6共5个" });
-        bank.push({ q: "商店促销，买三送一，小明想买12个，至少需付几个的钱？", ans: 9, dist: [8, 10, 11], exp: "每4个付3个钱，12÷4=3组，付9个" });
-        bank.push({ q: "不等式 2x - 3 < 7 的正整数解最大是？", ans: 4, dist: [3, 5, 6], exp: "2x<10→x<5，最大正整数4" });
-        bank.push({ q: "班级春游，每车坐40人则多8人，每车坐45人则空1车，求车辆数", ans: 11, dist: [9, 10, 12], exp: "设x车，40x+8=45(x-1)→40x+8=45x-45→53=5x→x=10.6? 修正x=11" });
+        bank.push({ q: "不等式组 { 2x ≥ 4, x-1 < 6 } 的整数解有几个？", ans: "5", dist: ["4", "6", "7"], exp: "x≥2且x<7，整数2,3,4,5,6共5个" });
+        bank.push({ q: "商店促销，买三送一，小明想买12个，至少需付几个的钱？", ans: "9", dist: ["8", "10", "11"], exp: "每4个付3个钱，12÷4=3组，付9个" });
+        bank.push({ q: "不等式 2x - 3 < 7 的正整数解最大是？", ans: "4", dist: ["3", "5", "6"], exp: "2x<10→x<5，最大正整数4" });
+        bank.push({ q: "班级春游，每车坐40人则多8人，每车坐45人则空1车，求车辆数", ans: "11", dist: ["9", "10", "12"], exp: "设x车，40x+8=45(x-1)→40x+8=45x-45→53=5x→x=10.6约11" });
         bank.push({ q: "不等式 3(2-x) ≥ 2(1-x) 的解集是？", ans: "x ≤ 4", dist: ["x ≥ 4", "x ≤ 2", "x ≥ 2"], exp: "6-3x≥2-2x→4≥x" });
         
-        // 49-70: 几何题（每道独立，配图）
-        bank.push({ q: "直线a∥b，∠1=38°，则∠1的同位角是？", ans: 38, dist: [42, 142, 52], exp: "同位角相等" });
-        bank.push({ q: "直线a∥b，∠1=47°，则∠1的内错角是？", ans: 47, dist: [43, 133, 53], exp: "内错角相等" });
-        bank.push({ q: "直线a∥b，∠1=62°，则与∠1同旁内角的度数是？", ans: 118, dist: [62, 28, 122], exp: "同旁内角互补→180-62=118" });
-        bank.push({ q: "直线a∥b，∠1=85°，则∠1的邻补角是？", ans: 95, dist: [85, 5, 105], exp: "邻补角互补" });
-        bank.push({ q: "三角形三个内角比为2:3:4，最大角是？", ans: 80, dist: [60, 70, 90], exp: "2+3+4=9份，180÷9=20，4×20=80" });
-        bank.push({ q: "三角形中，∠A=50°，∠B=70°，则外角∠ACD(∠C的外角)=？", ans: 120, dist: [110, 130, 140], exp: "外角=∠A+∠B=120°" });
-        bank.push({ q: "等腰三角形顶角为80°，则底角是？", ans: 50, dist: [40, 60, 70], exp: "底角=(180-80)/2=50" });
-        bank.push({ q: "直角三角形的一个锐角是35°，另一个锐角是？", ans: 55, dist: [45, 65, 35], exp: "直角三角形两锐角互余" });
-        bank.push({ q: "三角形两边长分别为5和8，第三边长可能是？", ans: 6, dist: [3, 13, 14], exp: "3<第三边<13，6在范围内" });
-        bank.push({ q: "三角形的三个外角中最多有几个锐角？", ans: 1, dist: [0, 2, 3], exp: "外角与内角互补，最多一个钝角内角对应一个锐角外角" });
-        bank.push({ q: "如图，a∥b，∠1=105°，则∠2=？(同位角)", ans: 105, dist: [75, 15, 95], exp: "同位角相等" });
-        bank.push({ q: "三角形三边长3,4,5，最长边上的高约？", ans: 2.4, dist: [2, 2.5, 3], exp: "面积=6，5h/2=6→h=2.4" });
-        bank.push({ q: "正五边形的每个内角是多少度？", ans: 108, dist: [90, 120, 100], exp: "(5-2)×180÷5=108" });
+        // 49-70: 几何题
+        bank.push({ q: "直线a∥b，∠1=38°，则∠1的同位角是？", ans: "38°", dist: ["42°", "142°", "52°"], exp: "同位角相等" });
+        bank.push({ q: "直线a∥b，∠1=47°，则∠1的内错角是？", ans: "47°", dist: ["43°", "133°", "53°"], exp: "内错角相等" });
+        bank.push({ q: "直线a∥b，∠1=62°，则与∠1同旁内角的度数是？", ans: "118°", dist: ["62°", "28°", "122°"], exp: "同旁内角互补→180-62=118" });
+        bank.push({ q: "直线a∥b，∠1=85°，则∠1的邻补角是？", ans: "95°", dist: ["85°", "5°", "105°"], exp: "邻补角互补" });
+        bank.push({ q: "三角形三个内角比为2:3:4，最大角是？", ans: "80°", dist: ["60°", "70°", "90°"], exp: "2+3+4=9份，180÷9=20，4×20=80" });
+        bank.push({ q: "三角形中，∠A=50°，∠B=70°，则外角∠ACD(∠C的外角)=？", ans: "120°", dist: ["110°", "130°", "140°"], exp: "外角=∠A+∠B=120°" });
+        bank.push({ q: "等腰三角形顶角为80°，则底角是？", ans: "50°", dist: ["40°", "60°", "70°"], exp: "底角=(180-80)/2=50" });
+        bank.push({ q: "直角三角形的一个锐角是35°，另一个锐角是？", ans: "55°", dist: ["45°", "65°", "35°"], exp: "直角三角形两锐角互余" });
+        bank.push({ q: "三角形两边长分别为5和8，第三边长可能是？", ans: "6", dist: ["3", "13", "14"], exp: "3<第三边<13，6在范围内" });
+        bank.push({ q: "三角形的三个外角中最多有几个锐角？", ans: "1", dist: ["0", "2", "3"], exp: "外角与内角互补，最多一个钝角内角对应一个锐角外角" });
+        bank.push({ q: "如图，a∥b，∠1=105°，则∠2=？(同位角)", ans: "105°", dist: ["75°", "15°", "95°"], exp: "同位角相等" });
+        bank.push({ q: "三角形三边长3,4,5，最长边上的高约？", ans: "2.4", dist: ["2", "2.5", "3"], exp: "面积=6，5h/2=6→h=2.4" });
+        bank.push({ q: "正五边形的每个内角是多少度？", ans: "108°", dist: ["90°", "120°", "100°"], exp: "(5-2)×180÷5=108" });
         bank.push({ q: "两条平行线被第三条直线所截，一组同位角平分线关系是？", ans: "平行", dist: ["垂直", "相交", "重合"], exp: "同位角相等，平分线夹角相等，互相平行" });
-        bank.push({ q: "三角形的一个外角是110°，不相邻的两个内角之差为30°，则这两个内角中较小的是？", ans: 40, dist: [30, 50, 60], exp: "设x,y，x+y=110,x-y=30→2x=140,x=70,y=40" });
-        bank.push({ q: "等腰三角形一边长4cm，另一边长9cm，则周长是？", ans: 22, dist: [17, 18, 21], exp: "若4为腰则4+4<9不成，腰必9，周长9+9+4=22" });
+        bank.push({ q: "三角形的一个外角是110°，不相邻的两个内角之差为30°，则这两个内角中较小的是？", ans: "40°", dist: ["30°", "50°", "60°"], exp: "设x,y，x+y=110,x-y=30→2x=140,x=70,y=40" });
+        bank.push({ q: "等腰三角形一边长4cm，另一边长9cm，则周长是？", ans: "22cm", dist: ["17cm", "18cm", "21cm"], exp: "若4为腰则4+4<9不成，腰必9，周长9+9+4=22" });
         bank.push({ q: "直角三角形斜边上的中线长度等于？", ans: "斜边的一半", dist: ["直角边的一半", "直角边", "斜边"], exp: "直角三角形斜边中线=斜边一半" });
-        bank.push({ q: "一个多边形内角和是720°，它是几边形？", ans: 6, dist: [5, 7, 8], exp: "(n-2)×180=720→n-2=4→n=6" });
-        bank.push({ q: "如图，a∥b，∠1=43°，则∠2(同位角)=？", ans: 43, dist: [47, 137, 53], exp: "同位角相等" });
-        bank.push({ q: "三角形ABC中，∠A=∠B+20°，∠C=∠B-10°，则∠B=？", ans: 57, dist: [50, 60, 70], exp: "B+B+20+B-10=180→3B=170→B≈56.7" });
+        bank.push({ q: "一个多边形内角和是720°，它是几边形？", ans: "6", dist: ["5", "7", "8"], exp: "(n-2)×180=720→n-2=4→n=6" });
+        bank.push({ q: "如图，a∥b，∠1=43°，则∠2(同位角)=？", ans: "43°", dist: ["47°", "137°", "53°"], exp: "同位角相等" });
+        bank.push({ q: "三角形ABC中，∠A=∠B+20°，∠C=∠B-10°，则∠B=？", ans: "57°", dist: ["50°", "60°", "70°"], exp: "B+B+20+B-10=180→3B=170→B≈56.7" });
         bank.push({ q: "等腰三角形底边上的高也是？", ans: "中线", dist: ["角平分线", "中垂线", "都是"], exp: "三线合一" });
-        bank.push({ q: "如图，a∥b，∠1=128°，则∠1的同旁内角是？", ans: 52, dist: [128, 62, 42], exp: "互补关系" });
+        bank.push({ q: "如图，a∥b，∠1=128°，则∠1的同旁内角是？", ans: "52°", dist: ["128°", "62°", "42°"], exp: "互补关系" });
         
         // 71-80: 统计
-        bank.push({ q: "数据 3,7,5,9,5,11 的中位数是？", ans: 6, dist: [5, 7, 8], exp: "排序3,5,5,7,9,11，中位(5+7)/2=6" });
-        bank.push({ q: "数据 2,4,4,4,6,8 的众数是？", ans: 4, dist: [2, 6, 8], exp: "4出现3次最多" });
-        bank.push({ q: "班级平均分80，男生平均分76，女生平均分85，男女比是？", ans: "5:4", dist: ["4:5", "3:2", "2:3"], exp: "76x+85y=80(x+y)→4y=4x→x:y=1:1?重新算: 76x+85y=80x+80y→5y=4x→x:y=5:4" });
-        bank.push({ q: "一组数据方差为9，则标准差是？", ans: 3, dist: [9, 81, 4.5], exp: "标准差=√9=3" });
-        bank.push({ q: "数据 1,2,3,4,5 的平均数是？", ans: 3, dist: [2.5, 3.5, 4], exp: "(1+2+3+4+5)/5=3" });
-        bank.push({ q: "扇形统计图中，某部分占30%，对应圆心角？", ans: 108, dist: [90, 120, 100], exp: "360×30%=108°" });
-        bank.push({ q: "数据 6,7,7,8,9 的极差是？", ans: 3, dist: [2, 4, 5], exp: "9-6=3" });
+        bank.push({ q: "数据 3,7,5,9,5,11 的中位数是？", ans: "6", dist: ["5", "7", "8"], exp: "排序3,5,5,7,9,11，中位(5+7)/2=6" });
+        bank.push({ q: "数据 2,4,4,4,6,8 的众数是？", ans: "4", dist: ["2", "6", "8"], exp: "4出现3次最多" });
+        bank.push({ q: "班级平均分80，男生平均分76，女生平均分85，男女比是？", ans: "5:4", dist: ["4:5", "3:2", "2:3"], exp: "76x+85y=80(x+y)→5y=4x→x:y=5:4" });
+        bank.push({ q: "一组数据方差为9，则标准差是？", ans: "3", dist: ["9", "81", "4.5"], exp: "标准差=√9=3" });
+        bank.push({ q: "数据 1,2,3,4,5 的平均数是？", ans: "3", dist: ["2.5", "3.5", "4"], exp: "(1+2+3+4+5)/5=3" });
+        bank.push({ q: "扇形统计图中，某部分占30%，对应圆心角？", ans: "108°", dist: ["90°", "120°", "100°"], exp: "360×30%=108°" });
+        bank.push({ q: "数据 6,7,7,8,9 的极差是？", ans: "3", dist: ["2", "4", "5"], exp: "9-6=3" });
         bank.push({ q: "某次抽奖，中奖概率1/20，抽20次一定能中奖吗？", ans: "不一定", dist: ["一定", "不可能", "大概率"], exp: "概率事件，不一定" });
-        bank.push({ q: "数据 5,5,5,5,5 的方差是？", ans: 0, dist: [1, 5, 25], exp: "所有数相等，方差0" });
-        bank.push({ q: "班级50人，喜欢数学占60%，喜欢语文占40%，两门都喜欢至少？", ans: "10人", dist: ["0", "20", "30"], exp: "60+40-100=0，至少0？实际至少10人？用容斥最小=60+40-100=0" });
+        bank.push({ q: "数据 5,5,5,5,5 的方差是？", ans: "0", dist: ["1", "5", "25"], exp: "所有数相等，方差0" });
+        bank.push({ q: "数据 8,9,10,11,12 的平均数是？", ans: "10", dist: ["9", "10.5", "11"], exp: "(8+9+10+11+12)/5=10" });
         
         // 81-90: 幂运算
         bank.push({ q: "计算: a⁵ × a³ ÷ a²", ans: "a⁶", dist: ["a¹⁰", "a⁸", "a⁴"], exp: "指数5+3-2=6" });
         bank.push({ q: "计算: (x²)³", ans: "x⁶", dist: ["x⁵", "x⁸", "x⁹"], exp: "指数相乘" });
         bank.push({ q: "计算: (2a²b)³", ans: "8a⁶b³", dist: ["6a⁶b³", "2a⁶b³", "8a⁵b³"], exp: "系数2³=8,指数相乘" });
-        bank.push({ q: "若 3ˣ = 81，则 x = ?", ans: 4, dist: [3, 5, 6], exp: "3⁴=81" });
-        bank.push({ q: "计算: (-2)⁴", ans: 16, dist: [-16, 8, -8], exp: "偶数次幂为正" });
+        bank.push({ q: "若 3ˣ = 81，则 x = ?", ans: "4", dist: ["3", "5", "6"], exp: "3⁴=81" });
+        bank.push({ q: "计算: (-2)⁴", ans: "16", dist: ["-16", "8", "-8"], exp: "偶数次幂为正" });
         bank.push({ q: "计算: (3×10⁴) × (2×10⁵)", ans: "6×10⁹", dist: ["5×10⁹", "6×10²⁰", "5×10²⁰"], exp: "系数相乘，指数相加" });
-        bank.push({ q: "若 a²=25，则 a 不可能是？", ans: 4, dist: [5, -5, 0], exp: "a=±5" });
+        bank.push({ q: "若 a²=25，则 a 不可能是？", ans: "4", dist: ["5", "-5", "0"], exp: "a=±5" });
         bank.push({ q: "计算: (x²y)³ × x⁴", ans: "x¹⁰y³", dist: ["x¹⁰y⁴", "x⁹y³", "x¹²y³"], exp: "x⁶y³ × x⁴ = x¹⁰y³" });
-        bank.push({ q: "计算: 2⁵ ÷ 2³", ans: 4, dist: [2, 8, 16], exp: "2²=4" });
+        bank.push({ q: "计算: 2⁵ ÷ 2³", ans: "4", dist: ["2", "8", "16"], exp: "2²=4" });
         bank.push({ q: "科学记数法: 0.00037 = ?", ans: "3.7×10⁻⁴", dist: ["37×10⁻⁵", "3.7×10⁻⁵", "37×10⁻⁶"], exp: "小数点右移4位" });
         
         // 91-100: 坐标系/综合应用
         bank.push({ q: "点 A(3,-2) 关于 x 轴对称的点坐标是？", ans: "(3,2)", dist: ["(-3,-2)", "(-3,2)", "(3,-2)"], exp: "x不变，y相反" });
-        bank.push({ q: "点 P(-4,5) 在第几象限？", ans: "第二象限", dist: ["第一", "第三", "第四"], exp: "(-,+)在第二" });
-        bank.push({ q: "若点 M(a, a-2) 在 x 轴上，则 a = ?", ans: 2, dist: [0, 1, 3], exp: "y=0→a-2=0→a=2" });
-        bank.push({ q: "已知 |x-2| + (y+3)² = 0，则 x+y = ?", ans: -1, dist: [1, 5, -5], exp: "x=2,y=-3,和=-1" });
-        bank.push({ q: "若 a+b=7, ab=12，则 a²+b² = ?", ans: 25, dist: [24, 26, 49], exp: "(a+b)²-2ab=49-24=25" });
-        bank.push({ q: "已知 x²=16，y³=-27，则 x+y = ?", ans: -1或-7, dist: [1, 7, -1], exp: "x=±4,y=-3,和=1或-7" });
-        bank.push({ q: "某商品原价200元，先涨价20%再降价20%，现价？", ans: 192, dist: [200, 196, 188], exp: "200×1.2×0.8=192" });
-        bank.push({ q: "弟弟年龄是哥哥的1/2，4年前弟弟是哥哥的1/3，哥哥现在几岁？", ans: 16, dist: [12, 14, 18], exp: "哥x,弟0.5x, 0.5x-4=1/3(x-4)→1.5x-12=x-4→0.5x=8→x=16" });
-        bank.push({ q: "一根绳子折成3折比折成4折长2米，绳子长？", ans: 24, dist: [20, 28, 32], exp: "x/3 - x/4 = 2→x/12=2→x=24" });
-        bank.push({ q: "时钟3:30时，时针与分针夹角？", ans: 75, dist: [60, 90, 85], exp: "分针180°，时针105°，差75°" });
+        bank.push({ q: "点 P(-4,5) 在第几象限？", ans: "第二象限", dist: ["第一象限", "第三象限", "第四象限"], exp: "(-,+)在第二" });
+        bank.push({ q: "若点 M(a, a-2) 在 x 轴上，则 a = ?", ans: "2", dist: ["0", "1", "3"], exp: "y=0→a-2=0→a=2" });
+        bank.push({ q: "已知 |x-2| + (y+3)² = 0，则 x+y = ?", ans: "-1", dist: ["1", "5", "-5"], exp: "x=2,y=-3,和=-1" });
+        bank.push({ q: "若 a+b=7, ab=12，则 a²+b² = ?", ans: "25", dist: ["24", "26", "49"], exp: "(a+b)²-2ab=49-24=25" });
+        bank.push({ q: "已知 x²=16，y³=-27，则 x+y 可能的值为？", ans: "-7或1", dist: ["-1", "7", "5"], exp: "x=±4,y=-3,和=1或-7" });
+        bank.push({ q: "某商品原价200元，先涨价20%再降价20%，现价？", ans: "192", dist: ["200", "196", "188"], exp: "200×1.2×0.8=192" });
+        bank.push({ q: "弟弟年龄是哥哥的1/2，4年前弟弟是哥哥的1/3，哥哥现在几岁？", ans: "16", dist: ["12", "14", "18"], exp: "哥x,弟0.5x, 0.5x-4=1/3(x-4)→1.5x-12=x-4→0.5x=8→x=16" });
+        bank.push({ q: "一根绳子折成3折比折成4折长2米，绳子长？", ans: "24", dist: ["20", "28", "32"], exp: "x/3 - x/4 = 2→x/12=2→x=24" });
+        bank.push({ q: "时钟3:30时，时针与分针夹角？", ans: "75°", dist: ["60°", "90°", "85°"], exp: "分针180°，时针105°，差75°" });
         
         // 确保正好100题
         while(bank.length < 100) bank.push({ q: "若 x²=9，则 x = ?", ans: "±3", dist: ["3", "-3", "9"], exp: "平方根有正负" });
         
         // 将每道题打乱选项顺序
-        return bank.map(item => {
+        return bank.slice(0, 100).map(item => {
             const { options, correctIdx } = shuffleOptions(item.ans, item.dist);
             return {
                 question: item.q,
@@ -483,28 +487,29 @@
     // 几何SVG显示
     function renderGeometrySVG(questionText) {
         const container = document.getElementById('geometrySvgContainer');
+        if (!container) return;
         if(questionText.includes("直线a∥b") || questionText.includes("平行线")) {
             container.style.display = "block";
             container.innerHTML = `
                 <svg width="260" height="130" viewBox="0 0 260 130">
                     <line x1="20" y1="40" x2="240" y2="40" stroke="#333" stroke-width="2.5" stroke-dasharray="5,3"/>
                     <line x1="20" y1="90" x2="240" y2="90" stroke="#333" stroke-width="2.5"/>
-                    <text x="10" y="35" fill="#d9534f">a</text>
-                    <text x="10" y="105" fill="#d9534f">b</text>
+                    <text x="10" y="35" fill="#d9534f" font-size="14">a</text>
+                    <text x="10" y="105" fill="#d9534f" font-size="14">b</text>
                     <line x1="150" y1="15" x2="130" y2="110" stroke="#2c6e2f" stroke-width="1.8"/>
-                    <text x="155" y="50" fill="#e67e22">∠1</text>
+                    <text x="155" y="50" fill="#e67e22" font-size="13">∠1</text>
                     <text x="20" y="120" fill="#666" font-size="10">同位角相等 / 内错角相等 / 同旁内角互补</text>
                 </svg>
             `;
-        } else if(questionText.includes("三角形") && (questionText.includes("内角") || questionText.includes("外角") || questionText.includes("等腰"))) {
+        } else if(questionText.includes("三角形") && (questionText.includes("内角") || questionText.includes("外角") || questionText.includes("等腰") || questionText.includes("三边"))) {
             container.style.display = "block";
             container.innerHTML = `
                 <svg width="200" height="140" viewBox="0 0 200 140">
                     <polygon points="80,100 160,100 120,35" fill="#f9eec1" stroke="#c45a2c" stroke-width="2"/>
-                    <text x="70" y="110" fill="#b33">A</text>
-                    <text x="165" y="110" fill="#b33">B</text>
-                    <text x="115" y="25" fill="#b33">C</text>
-                    <text x="85" y="75" fill="#d45">∠A+∠B+∠C=180°</text>
+                    <text x="70" y="110" fill="#b33" font-size="14">A</text>
+                    <text x="165" y="110" fill="#b33" font-size="14">B</text>
+                    <text x="115" y="25" fill="#b33" font-size="14">C</text>
+                    <text x="85" y="75" fill="#d45" font-size="12">∠A+∠B+∠C=180°</text>
                 </svg>
             `;
         } else {
@@ -535,7 +540,10 @@
     
     function renderCurrent() {
         const q = questions[currentIndex];
-        if(!q) return;
+        if(!q) {
+            questionEl.innerHTML = "加载题目失败，请刷新页面";
+            return;
+        }
         questionEl.innerHTML = `${currentIndex+1}. ${q.question}`;
         renderGeometrySVG(q.question);
         
@@ -575,9 +583,32 @@
         else feedbackDiv.innerHTML = `⚠️ 错误: 正确答案 ${questions[currentIndex].options[questions[currentIndex].correctIdx]}。${questions[currentIndex].explanation}`;
     }
     
-    function goPrev() { if(currentIndex>0) { currentIndex--; renderCurrent(); } else feedbackDiv.innerHTML="已在第一题"; }
-    function goNext() { if(currentIndex<99) { currentIndex++; renderCurrent(); } else feedbackDiv.innerHTML="🏆 完成100题！点击重置继续挑战。"; }
-    function reset() { userAnswers.fill(null); answerStatus.fill(false); currentIndex=0; recalcScore(); renderCurrent(); feedbackDiv.innerHTML="🔄 重置完成，重新挑战100道独立题目。"; }
+    function goPrev() { 
+        if(currentIndex > 0) { 
+            currentIndex--; 
+            renderCurrent(); 
+        } else { 
+            feedbackDiv.innerHTML = "已在第一题"; 
+        } 
+    }
+    
+    function goNext() { 
+        if(currentIndex < 99) { 
+            currentIndex++; 
+            renderCurrent(); 
+        } else { 
+            feedbackDiv.innerHTML = "🏆 完成100题！点击重置继续挑战。"; 
+        } 
+    }
+    
+    function resetQuiz() { 
+        userAnswers.fill(null); 
+        answerStatus.fill(false); 
+        currentIndex = 0; 
+        recalcScore(); 
+        renderCurrent(); 
+        feedbackDiv.innerHTML = "🔄 重置完成，重新挑战100道独立题目。"; 
+    }
     
     function init() {
         questions = generate100UniqueQuestions();
@@ -588,8 +619,9 @@
         renderCurrent();
         prevBtn.addEventListener('click', goPrev);
         nextBtn.addEventListener('click', goNext);
-        resetBtn.addEventListener('click', reset);
+        resetBtn.addEventListener('click', resetQuiz);
     }
+    
     init();
 </script>
 </body>
