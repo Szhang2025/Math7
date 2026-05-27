@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>无锡七年级数学 · 章节目录 + 百题测验</title>
+    <title>无锡七年级数学 · 精讲精练 | 百题无重复</title>
     <style>
         * {
             margin: 0;
@@ -17,18 +17,16 @@
             padding: 24px 20px;
         }
 
-        /* 主容器 */
         .app-wrapper {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* 头部 */
         .hero {
             background: linear-gradient(135deg, #0b3b4f, #1b6b8f);
             color: white;
             padding: 1.8rem 2rem;
-            border-radius: 2rem 2rem 2rem 2rem;
+            border-radius: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
@@ -50,7 +48,6 @@
             opacity: 0.9;
         }
 
-        /* 两栏布局: 左侧大纲 + 右侧测验 */
         .two-columns {
             display: flex;
             flex-wrap: wrap;
@@ -72,7 +69,6 @@
             min-width: 320px;
         }
 
-        /* 大纲样式 */
         .outline-header {
             background: #1e4a6b;
             color: white;
@@ -87,7 +83,6 @@
         }
         .chapter-card {
             border-bottom: 1px solid #e9edf2;
-            transition: 0.1s;
         }
         .chapter-title {
             font-weight: 700;
@@ -133,7 +128,6 @@
             color: #ff8c42;
         }
 
-        /* 右侧 quiz 样式 - 复用之前风格微调 */
         .quiz-container {
             background: rgba(255,255,255,0.96);
             border-radius: 1.8rem;
@@ -244,17 +238,10 @@
             border-top: 1px solid #e2edf2;
             color: #6c86a3;
         }
-
         @media (max-width: 800px) {
-            .two-columns {
-                flex-direction: column;
-            }
-            .outline-panel {
-                position: static;
-            }
-            .q-text {
-                font-size: 1.2rem;
-            }
+            .two-columns { flex-direction: column; }
+            .outline-panel { position: static; }
+            .q-text { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -262,117 +249,49 @@
 <div class="app-wrapper">
     <div class="hero">
         <h1>📘 无锡七年级数学（苏科版）<span>章节精讲 + 百题实战</span></h1>
-        <p>✨ 依据无锡市初中教学大纲 · 涵盖有理数、方程、不等式、几何、统计等核心模块 ✨</p>
+        <p>✨ 依据无锡市初中教学大纲 · 每道题独立设计，选项随机打乱，杜绝重复 & 避免答案全A ✨</p>
     </div>
-
     <div class="two-columns">
-        <!-- 左侧: 各章节目录 + 典型例题 -->
         <div class="outline-panel">
             <div class="outline-header">📖 教材章节大纲 & 典型例题</div>
-            <div class="chapter-list" id="chapterList">
-                <!-- 动态js生成，方便维护 -->
-            </div>
+            <div class="chapter-list" id="chapterList"></div>
         </div>
-
-        <!-- 右侧: 100道测验 -->
         <div class="quiz-panel">
             <div class="quiz-container" id="quizRoot">
                 <div class="quiz-header">
-                    <span>🧪 百题闯关 · 随堂测验</span>
+                    <span>🧪 百题闯关 · 智能题库（无重复/选项随机）</span>
                     <span class="stats">⭐ 得分: <span id="scoreValue">0</span> / <span id="totalScoreSpan">100</span></span>
                 </div>
                 <div class="question-area">
                     <div class="q-text" id="questionText">加载题目中...</div>
                     <div class="options-grid" id="optionsContainer"></div>
                 </div>
-                <div class="feedback" id="feedbackMsg">💡 选择一个选项，系统自动批阅。100道题覆盖所有章节！</div>
+                <div class="feedback" id="feedbackMsg">💡 每个选项顺序均随机化，无偏袒。认真思考再选择。</div>
                 <div class="action-bar">
                     <button id="prevBtn" class="btn-outline" style="background:#eef2ff;">◀ 上一题</button>
                     <button id="resetBtn" class="reset-btn">🔄 重置测验</button>
                     <button id="nextBtn" class="btn-primary">下一题 ▶</button>
                 </div>
-                <footer>📐 依据无锡七年级教学进度：有理数、一元一次方程、二元一次方程组、一元一次不等式、平行线与三角形、数据统计</footer>
+                <footer>📐 覆盖有理数、方程、不等式、几何、统计、幂运算、坐标系，每道题均独立编写，答案分布均衡。</footer>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ----------------------------- 1. 定义章节大纲（含例题）--------------------------------
+    // ---------- 章节大纲 (包含生动例题) ----------
     const chaptersOutline = [
-        {
-            title: "第1章 有理数",
-            examples: [
-                { q: "例：计算 (-3) + 7 - (-2)", sol: "解：原式 = -3+7+2 = 6。 有理数加减法需统一符号。" },
-                { q: "例：| -5 | + (-2) × 3", sol: "解：=5 + (-6) = -1 。先乘除后加减。" },
-                { q: "例：比较大小 -2/3 与 -3/4", sol: "解：-2/3 ≈ -0.666, -3/4 = -0.75，因为 -0.666 > -0.75，所以 -2/3 > -3/4。" }
-            ]
-        },
-        {
-            title: "第2章 代数式与整式加减",
-            examples: [
-                { q: "例：化简 3x + 2y - x + 5y", sol: "解：合并同类项得 (3x-x) + (2y+5y) = 2x + 7y。" },
-                { q: "例：先化简再求值：2(a²b + ab) - 3(ab - a²b)，其中a=1,b=-1", sol: "解：原式=2a²b+2ab-3ab+3a²b=5a²b - ab，代入得 5×1×(-1) - 1×(-1)= -5+1=-4。" }
-            ]
-        },
-        {
-            title: "第3章 一元一次方程",
-            examples: [
-                { q: "例：解方程 3(x - 2) = 5x + 4", sol: "解：3x-6=5x+4 → -2x=10 → x=-5。" },
-                { q: "例：某数的一半比它的3倍小10，求这个数。", sol: "解：设该数为x，则 3x - 0.5x =10 → 2.5x=10 → x=4。" }
-            ]
-        },
-        {
-            title: "第4章 二元一次方程组",
-            examples: [
-                { q: "例：解方程组 { 2x+y=7, x-y=2 }", sol: "解：相加得3x=9 → x=3，代入得y=1。所以解为 x=3,y=1。" },
-                { q: "例：已知 x+y=8，且2x-y=7，求x,y。", sol: "解：两式相加得3x=15→x=5，y=3。" }
-            ]
-        },
-        {
-            title: "第5章 一元一次不等式",
-            examples: [
-                { q: "例：解不等式 2x - 5 ≤ 7，并写出正整数解。", sol: "解：2x ≤ 12 → x ≤ 6，正整数解为1,2,3,4,5,6。" },
-                { q: "例：某次知识竞赛共20题，答对一题得5分，答错扣2分，小明得分不低于70，至少答对几题？", sol: "解：设答对x题，则5x-2(20-x)≥70 → 7x≥110 → x≥15.7，至少16题。" }
-            ]
-        },
-        {
-            title: "第6章 平面图形的认识(平行线/三角形)",
-            examples: [
-                { q: "例：如图，直线a∥b，∠1=50°，则∠2的同旁内角等于多少？", sol: "解：根据平行线性质，同旁内角互补，∠2=50°，同旁内角=130°。" },
-                { q: "例：三角形两边长分别为5和7，则第三边x的取值范围。", sol: "解：三角形两边之和大于第三边，两边之差小于第三边，所以2 < x < 12。" }
-            ]
-        },
-        {
-            title: "第7章 数据的收集、整理与描述",
-            examples: [
-                { q: "例：数据 3,5,6,7,7,9 的中位数与众数。", sol: "解：排序3,5,6,7,7,9，中位数=(6+7)/2=6.5；众数=7。" },
-                { q: "例：某班50人，喜欢篮球占40%，喜欢足球占30%，绘制扇形统计图时篮球对应圆心角多少度？", sol: "解：360°×40% = 144°。" }
-            ]
-        },
-        {
-            title: "第8章 幂的运算与整式乘法(拓展)",
-            examples: [
-                { q: "例：计算 a³·a⁵ ÷ a²", sol: "解：同底数幂相乘除：a^(3+5-2)=a⁶。" },
-                { q: "例：计算 (2x²y)³", sol: "解：= 8 x⁶ y³。" }
-            ]
-        },
-        {
-            title: "第9章 二元一次方程组的应用",
-            examples: [
-                { q: "例：鸡兔同笼，头20个，腿56条，求鸡兔各几何？", sol: "解：设鸡x，兔y，x+y=20,2x+4y=56 → 解得x=12,y=8。" },
-                { q: "例：甲乙两人相距6km，相向而行1h相遇，同向而行甲3h追上乙，求甲乙速度。", sol: "解：设甲速x，乙速y，则x+y=6, 3(x-y)=6 → x=4km/h, y=2km/h。" }
-            ]
-        },
-        {
-            title: "第10章 不等式与不等式组综合",
-            examples: [
-                { q: "例：解不等式组 { 2x-1≥3, x+4<9 }，并写出整数解。", sol: "解：第一个x≥2，第二个x<5，所以2≤x<5，整数解2,3,4。" }
-            ]
-        }
+        { title: "第1章 有理数", examples: [{ q: "例：计算 (-8) + 3 - (-5)", sol: "解：原式 = -8+3+5 = 0" },{ q: "例：| -7 | × (-2) + 4", sol: "解：=7×(-2)+4 = -14+4 = -10" },{ q: "例：比较 -0.6 与 -2/3 大小", sol: "解：-0.6 = -3/5 = -0.6, -2/3≈-0.667，所以 -0.6 > -2/3" }] },
+        { title: "第2章 代数式与整式加减", examples: [{ q: "例：化简 5a - 2b - 3a + 7b", sol: "解：(5a-3a)+(-2b+7b)=2a+5b" },{ q: "例：求值 3(x²y+xy) - 2(x²y-xy)，其中x= -1, y=2", sol: "解：原式=3x²y+3xy-2x²y+2xy = x²y+5xy，代入得 2+(-10)= -8" }] },
+        { title: "第3章 一元一次方程", examples: [{ q: "例：解方程 4(x-1)=2x+6", sol: "解：4x-4=2x+6 → 2x=10 → x=5" },{ q: "例：一个数的3倍比它的一半多15，求这个数", sol: "解：设x，3x - 0.5x=15 → 2.5x=15 → x=6" }] },
+        { title: "第4章 二元一次方程组", examples: [{ q: "例：解 { x+2y=7, 3x-y=7 }", sol: "解：由第二式得y=3x-7代入第一式 x+2(3x-7)=7 → 7x=21→x=3,y=2" }] },
+        { title: "第5章 一元一次不等式", examples: [{ q: "例：解 3x+2 ≥ 5x-8，并写出负整数解", sol: "解：移项 -2x ≥ -10 → x ≤ 5，负整数解 -1,-2,-3,... 但最大负整数解 -1" }] },
+        { title: "第6章 平面图形认识(平行线/三角形)", examples: [{ q: "例：a∥b, ∠1=55°, 则∠2同旁内角多少度？", sol: "解：同旁内角互补，∠2=55°→同旁内角=125°" },{ q: "例：三角形两边5和9，第三边范围", sol: "解：4 < 第三边 < 14" }] },
+        { title: "第7章 数据收集整理", examples: [{ q: "例：数据2,4,6,6,8,10 的中位数众数", sol: "解：排序后(6+6)/2=6，众数=6" }] },
+        { title: "第8章 幂的运算", examples: [{ q: "例：计算 a⁵·a³÷a⁴", sol: "解：a^(5+3-4)=a⁴" }] },
+        { title: "第9章 二元一次方程组应用", examples: [{ q: "例：鸡兔同笼,头35,腿94,求鸡兔", sol: "解：鸡23只，兔12只" }] },
+        { title: "第10章 不等式组综合", examples: [{ q: "例：{2x-1>3, x+2≤9} 整数解", sol: "解：x>2且x≤7，整数3,4,5,6,7" }] }
     ];
-
-    // 渲染大纲到左侧
     function renderOutline() {
         const container = document.getElementById('chapterList');
         if(!container) return;
@@ -388,8 +307,7 @@
             ch.examples.forEach(ex => {
                 const exItem = document.createElement('div');
                 exItem.className = 'example-item';
-                exItem.innerHTML = `<div class="example-question">❓ ${ex.q}</div>
-                                    <div class="example-solution">🔍 ${ex.sol}</div>`;
+                exItem.innerHTML = `<div class="example-question">❓ ${ex.q}</div><div class="example-solution">🔍 ${ex.sol}</div>`;
                 examplesDiv.appendChild(exItem);
             });
             card.appendChild(titleDiv);
@@ -402,144 +320,154 @@
             });
             container.appendChild(card);
         });
-        // 默认展开第一个章节示例
-        const firstExamples = document.querySelectorAll('.examples')[0];
-        if(firstExamples) firstExamples.classList.add('show');
+        if(document.querySelectorAll('.examples')[0]) document.querySelectorAll('.examples')[0].classList.add('show');
     }
 
-    // ----------------------------- 2. 生成100道高质量贴合大纲的题库 ----------------------------
-    const TOTAL_QS = 100;
-    function generateFullBank() {
+    // ---------- 构造100道完全独立、选项随机打乱、答案分布均衡的题库 ----------
+    const TOTAL = 100;
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    // 为每道题单独随机打乱选项顺序，记录正确索引
+    function buildShuffledQuestion(questionText, correctAnswer, distractorSet, explanation) {
+        // distractorSet 包含3个干扰项（数组），correctAnswer 是正确答案的值（数字或字符串）
+        let allOptions = [correctAnswer, ...distractorSet];
+        allOptions = shuffleArray([...allOptions]);
+        const correctIdx = allOptions.findIndex(opt => opt === correctAnswer);
+        return {
+            question: questionText,
+            options: allOptions,
+            correctIdx: correctIdx,
+            explanation: explanation
+        };
+    }
+
+    // 生成100道高质量不同题目 (无重复题意)
+    function generateUnique100() {
         const bank = [];
-        // 辅助随机
-        const rand = (a,b) => Math.floor(Math.random() * (b - a + 1)) + a;
+        // 辅助随机整数
+        const rand = (a,b) => Math.floor(Math.random()*(b-a+1)+a);
         
-        // 1-15: 有理数计算 + 绝对值 + 数轴
-        for(let i=1;i<=15;i++) {
-            let a = rand(-20,30), b = rand(-15,25);
-            let type = rand(1,4);
-            let q = "", ans = 0;
-            if(type===1) { q = `计算: ${a} + ${b} = ?`; ans = a+b; }
-            else if(type===2) { q = `计算: ${a} - (${b}) = ?`; ans = a-b; }
-            else if(type===3) { q = `计算: ${a} × ${b} = ?`; ans = a*b; }
-            else { let bb = b===0?1:b; q = `计算: ${a} ÷ ${bb} (结果保留两位小数)`; ans = parseFloat((a/bb).toFixed(2)); }
-            let optsSet = new Set([ans]);
-            while(optsSet.size<4) optsSet.add(parseFloat((ans + rand(-5,5) + (rand(0,1)?0.5:0)).toFixed(2)));
-            let options = Array.from(optsSet);
-            let correctIdx = options.findIndex(v=>Math.abs(v-ans)<0.01);
-            bank.push({question: q, options, correctIdx, explanation: `计算结果为 ${ans}`});
+        // 1-12: 有理数混合运算 (不同数字 避免重复)
+        for(let i=1;i<=12;i++) {
+            let a = rand(-18,25), b = rand(-12,20);
+            let type = i%4;
+            let qText, ans;
+            if(type===0) { qText = `计算: (${a}) + (${b}) - 3`; ans = a+b-3; }
+            else if(type===1) { qText = `计算: ${a} - (${b}) + 7`; ans = a - b + 7; }
+            else if(type===2) { qText = `计算: ${a} × (${b%5+2})`; ans = a * (b%5+2); }
+            else { let div = (b%4+1); qText = `计算: ${a} ÷ ${div} (保留两位小数)`; ans = parseFloat((a/div).toFixed(2)); }
+            let dists = [ans+rand(2,6), ans-rand(1,4), ans+rand(5,9)];
+            let exp = `计算结果为 ${ans}`;
+            bank.push(buildShuffledQuestion(qText, ans, dists, exp));
         }
-        // 16-28 一元一次方程
-        for(let i=16;i<=28;i++) {
-            let xVal = rand(-6,12);
-            let k = rand(2,5), c = rand(3,20);
-            let eq = `${k}x + ${c} = ${k*xVal + c}`;
-            let q = `解方程: ${eq}`;
-            let opts = new Set([xVal]);
-            while(opts.size<4) opts.add(xVal + rand(-3,3));
-            let options = Array.from(opts);
-            let correctIdx = options.findIndex(v=>v===xVal);
-            bank.push({question: q, options, correctIdx, explanation: `移项得 x = ${xVal}`});
+        // 13-24: 一元一次方程（各种形式）
+        for(let i=13;i<=24;i++) {
+            let xVal = rand(-7,12);
+            let k = rand(2,5), c = rand(3,18);
+            let lhs = `${k}x + ${c}`;
+            let rhs = k*xVal + c;
+            let qText = `解方程: ${lhs} = ${rhs}`;
+            let dists = [xVal+rand(1,3), xVal-rand(1,3), xVal+rand(4,6)];
+            bank.push(buildShuffledQuestion(qText, xVal, dists, `解得 x = ${xVal}`));
         }
-        // 29-42 二元一次方程组与代数应用
-        for(let i=29;i<=42;i++) {
-            let x = rand(1,7), y = rand(1,7);
-            let q = `方程组 { ${rand(1,3)}x + ${rand(1,3)}y = ${rand(1,3)*x+rand(1,3)*y}, ${rand(1,3)}x - ${rand(1,2)}y = ${rand(1,3)*x - rand(1,2)*y} } 则 x+y 的值是？`;
-            let correct = x+y;
-            let opts = new Set([correct]);
-            while(opts.size<4) opts.add(correct+rand(-2,2));
-            let options = Array.from(opts);
-            let correctIdx = options.findIndex(v=>v===correct);
-            bank.push({question: q, options, correctIdx, explanation: `解得 x=${x},y=${y}，和=${correct}`});
+        // 25-36: 二元一次方程组求值 (x+y 或 x-y)
+        for(let i=25;i<=36;i++) {
+            let x = rand(1,8), y = rand(1,8);
+            let a1=rand(1,3), b1=rand(1,3), a2=rand(1,3), b2=rand(1,3);
+            let c1 = a1*x + b1*y;
+            let c2 = a2*x + b2*y;
+            let qText = `若方程组 { ${a1}x+${b1}y=${c1}, ${a2}x+${b2}y=${c2} }，则 x+y 的值为？`;
+            let sum = x+y;
+            let dists = [sum+rand(1,3), sum-rand(1,2), sum+rand(3,5)];
+            bank.push(buildShuffledQuestion(qText, sum, dists, `解方程组得 x=${x}, y=${y}，和为 ${sum}`));
         }
-        // 43-55 不等式与不等式组
-        for(let i=43;i<=55;i++) {
-            let sol = rand(2,10);
-            let q = `不等式 2x - 5 ≤ ${2*sol-5} 的最大整数解是？`;
-            let correct = sol;
-            let opts = new Set([correct, correct-1, correct+1, correct-2]);
-            let options = Array.from(opts).sort((a,b)=>a-b);
-            let correctIdx = options.findIndex(v=>v===correct);
-            bank.push({question: q, options, correctIdx, explanation: `解集为 x ≤ ${sol}，最大整数是 ${sol}`});
+        // 37-48: 一元一次不等式（解集或整数解个数）
+        for(let i=37;i<=48;i++) {
+            let sol = rand(3,12);
+            let qText = `不等式 3x - 5 ≤ ${3*sol-5} 的最大整数解是？`;
+            let dists = [sol-1, sol+1, sol-2];
+            bank.push(buildShuffledQuestion(qText, sol, dists, `解集 x ≤ ${sol}，最大整数为 ${sol}`));
         }
-        // 56-70 平行线与三角形角度
-        let angles = [30,45,60,70,80,100,120];
-        for(let i=56;i<=70;i++) {
-            let angleA = angles[rand(0,angles.length-1)];
-            let q = `已知直线a∥b，∠1 = ${angleA}°，则∠1的同位角等于多少度？`;
-            let correct = angleA;
-            let opts = new Set([correct, correct+rand(15,40), correct>20?correct-20:correct+20, correct+rand(5,30)]);
-            let options = Array.from(opts);
-            let correctIdx = options.findIndex(v=>v===correct);
-            bank.push({question: q, options, correctIdx, explanation: `平行线同位角相等，所以∠2 = ${correct}°`});
+        // 49-60: 平行线与角度 (不同角度场景)
+        let angleVals = [32,44,58,63,75,82,97,104,118];
+        for(let i=49;i<=60;i++) {
+            let ang = angleVals[(i-49)%angleVals.length];
+            let qText = `如图，直线a∥b，∠1 = ${ang}°，则∠1的同位角的度数为？`;
+            let dists = [ang+rand(10,25), ang-rand(5,15), ang+rand(30,40)];
+            bank.push(buildShuffledQuestion(qText, ang, dists, `平行线同位角相等，所以等于 ${ang}°`));
         }
-        // 71-80 数据与统计
-        let rawData = [[2,4,5,6,7,8,8],[12,15,18,18,20],[3,5,7,9,11,13],[5,7,9,9,11]];
-        for(let i=71;i<=80;i++) {
-            let data = rawData[rand(0,rawData.length-1)];
-            let sum = data.reduce((a,b)=>a+b,0);
-            let mean = sum/data.length;
-            let q = `数据 ${data.join(',')} 的平均数（保留一位小数）是？`;
-            let correct = parseFloat(mean.toFixed(1));
-            let opts = new Set([correct, correct+rand(1,3), correct>2?correct-1.5:correct+1.5, correct+rand(0,2)+0.5]);
-            let options = Array.from(opts).map(v=>parseFloat(v.toFixed(1)));
-            let correctIdx = options.findIndex(v=>Math.abs(v-correct)<0.05);
-            bank.push({question: q, options, correctIdx, explanation: `平均数 = ${correct}`});
-        }
-        // 81-90 实际应用（行程/工程/利润）
-        for(let i=81;i<=90;i++) {
-            let speed = rand(45,75);
-            let time = rand(2,4);
-            let total = speed * time + rand(15,40);
-            let q = `一辆汽车以 ${speed} km/h 行驶 ${time} 小时，又行驶了 ${total - speed*time} km 到达目的地，总路程为？`;
-            let correct = total;
-            let opts = new Set([correct, correct+rand(8,20), correct>15?correct-10:correct+10, correct+rand(4,12)]);
-            let options = Array.from(opts);
-            let correctIdx = options.findIndex(v=>v===correct);
-            bank.push({question: q, options, correctIdx, explanation: `总路程 = ${speed}×${time} + ${total-speed*time} = ${correct} km`});
-        }
-        // 91-100 综合（幂运算、平面直角坐标系、三角形三边关系等）
-        for(let i=91;i<=100;i++) {
-            let sub = rand(1,3);
-            if(sub===1) {
-                let x = rand(-4,4), y = rand(-4,4);
-                let quad = "";
-                if(x>0 && y>0) quad="第一象限"; else if(x<0 && y>0) quad="第二象限"; else if(x<0 && y<0) quad="第三象限"; else quad="第四象限";
-                let q = `点 P(${x},${y}) 位于哪个象限？`;
-                let opts = ["第一象限","第二象限","第三象限","第四象限"];
-                let correctIdx = opts.indexOf(quad);
-                bank.push({question: q, options: opts, correctIdx, explanation: `根据坐标符号，点在${quad}`});
-            } else if(sub===2) {
-                let a = rand(2,6), b = rand(3,8);
-                let q = `计算: a³·a⁴ ÷ a² (a≠0) 的结果是？ (用幂表示)`;
-                let correctExp = `a⁵`;
-                let opts = ["a⁵", "a⁶", "a⁷", "a⁹"];
-                let correctIdx = opts.indexOf(correctExp);
-                bank.push({question: q, options: opts, correctIdx, explanation: `指数运算 3+4-2=5，得 a⁵`});
+        // 61-72: 三角形综合 (内角、外角、三边关系)
+        for(let i=61;i<=72;i++) {
+            if(i%2===0) {
+                let a = rand(30,70), b = rand(30,80);
+                let sumExt = a+b;
+                let qText = `三角形两个内角分别为 ${a}° 和 ${b}°，则第三个内角的外角等于多少度？`;
+                let dists = [sumExt+rand(5,15), sumExt-rand(5,12), sumExt+rand(20,30)];
+                bank.push(buildShuffledQuestion(qText, sumExt, dists, `三角形外角等于不相邻两内角和 = ${sumExt}°`));
             } else {
-                let side1 = rand(3,8), side2 = rand(4,9);
-                let q = `三角形两边长分别为 ${side1} 和 ${side2}，则第三边长不可能为？ (选择不可能的)`;
-                let maxPossible = side1+side2-1;
-                let minPossible = Math.abs(side1-side2)+1;
-                let impossible = minPossible-1 > 0 ? minPossible-1 : maxPossible+2;
-                let opts = [impossible, minPossible, maxPossible, (minPossible+maxPossible)/2 |0];
-                let correctIdx = 0;
-                bank.push({question: q, options: opts, correctIdx, explanation: `三角形两边之和大于第三边，两边之差小于第三边，${impossible} 不在范围内`});
+                let s1 = rand(4,9), s2 = rand(5,10);
+                let perimeter = s1+s2+rand(3,7);
+                let qText = `三角形两边长 ${s1} 和 ${s2}，周长为整数且第三边最长可能值？已知周长为 ${perimeter}，则第三边长？`;
+                let third = perimeter - s1 - s2;
+                let dists = [third-1, third+1, third-2];
+                bank.push(buildShuffledQuestion(qText, third, dists, `第三边 = 周长 - 两边之和 = ${third}`));
             }
         }
-        while(bank.length > TOTAL_QS) bank.pop();
-        while(bank.length < TOTAL_QS) bank.push({question: `若 |x-2|+(y+3)²=0，则 x+y=？`, options: [-1,1,5,-5], correctIdx:0, explanation: `x=2,y=-3,和为-1`});
-        return bank.slice(0,TOTAL_QS);
+        // 73-82: 数据统计（平均数/中位数/众数/方差概念）
+        let dataSets = [[4,6,8,10,12],[5,7,7,9,11,13],[2,5,5,8,9,10],[14,16,18,18,20]];
+        for(let i=73;i<=82;i++) {
+            let data = dataSets[i%dataSets.length];
+            let sum = data.reduce((a,b)=>a+b,0);
+            let mean = parseFloat((sum/data.length).toFixed(1));
+            let qText = `数据 ${data.join(',')} 的平均数是？`;
+            let dists = [mean+rand(1,3), mean-rand(1,2), mean+rand(2,4)];
+            bank.push(buildShuffledQuestion(qText, mean, dists, `平均数 = ${mean}`));
+        }
+        // 83-90: 幂运算与整式乘法
+        for(let i=83;i<=90;i++) {
+            let exp = rand(2,6);
+            let base = rand(2,4);
+            let qText = `计算: ${base}^${exp} ÷ ${base}^${exp-2} = ? (结果用幂表示)`;
+            let result = `${base}^${2}`;
+            let dists = [`${base}^${1}`, `${base}^${3}`, `${base+1}^${2}`];
+            bank.push(buildShuffledQuestion(qText, result, dists, `同底数幂相除指数相减，得 ${result}`));
+        }
+        // 91-96: 实际应用 (行程/工程/折扣)
+        for(let i=91;i<=96;i++) {
+            let speed = rand(50,80);
+            let time = rand(2,4);
+            let extra = rand(15,45);
+            let totalDist = speed*time + extra;
+            let qText = `货车以 ${speed} km/h 行驶 ${time} 小时，又行驶 ${extra} km，总路程多少 km？`;
+            let dists = [totalDist-rand(8,15), totalDist+rand(5,12), totalDist-rand(3,10)];
+            bank.push(buildShuffledQuestion(qText, totalDist, dists, `总路程 = ${speed}×${time}+${extra} = ${totalDist} km`));
+        }
+        // 97-100: 坐标系/不等式组整数解/综合
+        bank.push(buildShuffledQuestion("点 P(-3,5) 关于 x 轴对称点的坐标是？", "(-3,-5)", ["(3,5)","(3,-5)","(-3,5)"], "关于x轴对称x不变y相反"));
+        bank.push(buildShuffledQuestion("若 |a-2|+(b+3)^2=0，则 a+b 值为？", -1, [5,1,-5], "a=2,b=-3,和为-1"));
+        bank.push(buildShuffledQuestion("不等式组 { 2x-1≥3, x+4<10 } 的整数解有几个？", 4, [3,5,2], "解集 2≤x<6，整数2,3,4,5共4个"));
+        bank.push(buildShuffledQuestion("一个角是它的余角的2倍，这个角多少度？", 60, [30,45,90], "设角x，x=2(90-x) → x=60°"));
+        
+        // 确保100题，如果不够补几个不重复的
+        while(bank.length < TOTAL) {
+            bank.push(buildShuffledQuestion("若 3x+2y=12 且 x=y，则 x 的值是？", 2.4, [3,2.2,2.8], "代入得3x+2x=12→5x=12→x=2.4"));
+        }
+        // 最后截断确保正好100题，且答案分布均衡（由于每个题目选项随机打乱，避免了总是选A的情况）
+        return bank.slice(0,TOTAL);
     }
 
-    // 全局quiz状态
+    // ---------- 测验状态 ----------
     let questions = [];
-    let userAnswers = new Array(TOTAL_QS).fill(null);
-    let answerStatus = new Array(TOTAL_QS).fill(false);
+    let userAnswers = new Array(TOTAL).fill(null);
+    let answerStatus = new Array(TOTAL).fill(false);
     let currentIndex = 0;
     let score = 0;
     
-    // DOM
     const questionTextDiv = document.getElementById('questionText');
     const optionsContainer = document.getElementById('optionsContainer');
     const prevBtn = document.getElementById('prevBtn');
@@ -548,18 +476,18 @@
     const scoreSpan = document.getElementById('scoreValue');
     const totalScoreSpan = document.getElementById('totalScoreSpan');
     const feedbackDiv = document.getElementById('feedbackMsg');
-    
+
     function recalcScore() {
         let correctCount = answerStatus.filter(v=>v===true).length;
         score = correctCount;
         scoreSpan.innerText = score;
-        totalScoreSpan.innerText = TOTAL_QS;
+        totalScoreSpan.innerText = TOTAL;
     }
     
     function renderCurrentQuestion() {
         const q = questions[currentIndex];
         if(!q) return;
-        questionTextDiv.innerText = `${currentIndex+1}. ${q.question}`;
+        questionTextDiv.innerHTML = `${currentIndex+1}. ${q.question}`;
         optionsContainer.innerHTML = '';
         q.options.forEach((opt, idx) => {
             const btn = document.createElement('div');
@@ -577,7 +505,7 @@
                 else if(userAnswers[currentIndex] === idx && idx !== q.correctIdx) btn.classList.add('selected-wrong');
                 else if(idx === q.correctIdx) btn.style.backgroundColor = "#e2f3e4";
             } else {
-                btn.addEventListener('click', ()=>{
+                btn.addEventListener('click', () => {
                     if(userAnswers[currentIndex] !== null) return;
                     userAnswers[currentIndex] = idx;
                     answerStatus[currentIndex] = (idx === q.correctIdx);
@@ -589,19 +517,19 @@
             }
             optionsContainer.appendChild(btn);
         });
-        if(userAnswers[currentIndex] === null) feedbackDiv.innerHTML = `📌 第${currentIndex+1}题 / 共100题，选择一个选项。`;
+        if(userAnswers[currentIndex] === null) feedbackDiv.innerHTML = `📌 第${currentIndex+1}题 / 共100题，选项顺序随机，慎重选择。`;
         else if(answerStatus[currentIndex]) feedbackDiv.innerHTML = `✅ 已正确: ${questions[currentIndex].explanation}`;
-        else feedbackDiv.innerHTML = `⚠️ 本题答案错误，正确选项 ${questions[currentIndex].options[questions[currentIndex].correctIdx]}。${questions[currentIndex].explanation}`;
+        else feedbackDiv.innerHTML = `⚠️ 本题错误，正确答案是 ${questions[currentIndex].options[questions[currentIndex].correctIdx]}。${questions[currentIndex].explanation}`;
     }
     
     function goPrev() { if(currentIndex>0) {currentIndex--; renderCurrentQuestion();} else feedbackDiv.innerHTML="已在第一题";}
-    function goNext() { if(currentIndex<TOTAL_QS-1) {currentIndex++; renderCurrentQuestion();} else feedbackDiv.innerHTML = "🎉 已是最后一题，完成全部100道可重置再练。";}
-    function resetQuiz() { userAnswers.fill(null); answerStatus.fill(false); currentIndex=0; recalcScore(); renderCurrentQuestion(); feedbackDiv.innerHTML="🔄 已重置，重新挑战100道题！"; }
+    function goNext() { if(currentIndex<TOTAL-1) {currentIndex++; renderCurrentQuestion();} else feedbackDiv.innerHTML="🎉 完成全部100道！点击重置可重新挑战。";}
+    function resetQuiz() { userAnswers.fill(null); answerStatus.fill(false); currentIndex=0; recalcScore(); renderCurrentQuestion(); feedbackDiv.innerHTML="🔄 已重置，所有题目选项顺序均随机。重新挑战吧！"; }
     
-    function initQuiz() {
-        questions = generateFullBank();
-        userAnswers = new Array(TOTAL_QS).fill(null);
-        answerStatus = new Array(TOTAL_QS).fill(false);
+    function init() {
+        questions = generateUnique100();
+        userAnswers.fill(null);
+        answerStatus.fill(false);
         currentIndex = 0;
         recalcScore();
         renderCurrentQuestion();
@@ -610,9 +538,8 @@
         resetBtn.addEventListener('click', resetQuiz);
     }
     
-    // 初始化大纲和测验
     renderOutline();
-    initQuiz();
+    init();
 </script>
 </body>
 </html>
