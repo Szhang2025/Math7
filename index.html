@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>无锡七年级数学 · 章节目录 + 百题测验</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f7;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans CJK SC', 'PingFang SC', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            padding: 24px 20px;
+        }
+
+        /* 主容器 */
+        .app-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .hero {
+            background: linear-gradient(135deg, #0b3b4f, #1b6b8f);
+            color: white;
+            padding: 1.8rem 2rem;
+            border-radius: 2rem 2rem 2rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .hero h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .hero h1 span {
+            background: #ffb347;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 1rem;
+        }
+        .hero p {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* 两栏布局: 左侧大纲 + 右侧测验 */
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+        .outline-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: white;
+            border-radius: 1.8rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        .quiz-panel {
+            flex: 2.2;
+            min-width: 320px;
+        }
+
+        /* 大纲样式 */
+        .outline-header {
+            background: #1e4a6b;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .chapter-list {
+            padding: 0.8rem 0;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+        .chapter-card {
+            border-bottom: 1px solid #e9edf2;
+            transition: 0.1s;
+        }
+        .chapter-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 1rem 1.5rem 0.3rem 1.5rem;
+            color: #0f3b5c;
+            background: #fafcff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chapter-title:hover {
+            background: #eef4fc;
+        }
+        .examples {
+            padding: 0 1.5rem 1rem 1.5rem;
+            background: #fefef7;
+            display: none;
+        }
+        .examples.show {
+            display: block;
+        }
+        .example-item {
+            background: #f8fafd;
+            margin: 0.6rem 0;
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            border-left: 4px solid #ffb347;
+            font-size: 0.9rem;
+        }
+        .example-question {
+            font-weight: 600;
+            color: #1e4663;
+        }
+        .example-solution {
+            color: #2c6e2f;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+        .toggle-icon {
+            font-size: 1rem;
+            color: #ff8c42;
+        }
+
+        /* 右侧 quiz 样式 - 复用之前风格微调 */
+        .quiz-container {
+            background: rgba(255,255,255,0.96);
+            border-radius: 1.8rem;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .quiz-header {
+            background: #2c5a74;
+            padding: 1rem 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stats {
+            background: #f0d78c;
+            color: #2c3e2f;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+        .question-area {
+            padding: 1.8rem;
+        }
+        .q-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.8rem;
+        }
+        .opt-btn {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 60px;
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+        .opt-btn:hover:not(.disabled-opt) {
+            background: #eef2ff;
+            border-color: #1e4a6b;
+        }
+        .opt-prefix {
+            background: #e2e8f0;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+        .selected-correct {
+            background: #dcfce7;
+            border-color: #2b9348;
+        }
+        .selected-wrong {
+            background: #ffe6e5;
+            border-color: #e3342f;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1.8rem 1.8rem 1.8rem;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #eef2ff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #1e4a6b;
+            color: white;
+        }
+        .reset-btn {
+            background: #f1d5d9;
+            color: #a12a2a;
+        }
+        .feedback {
+            background: #f0f4fa;
+            margin: 0 1.5rem 1.2rem 1.5rem;
+            padding: 12px 18px;
+            border-radius: 1.2rem;
+            border-left: 5px solid #ffaa44;
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.7rem;
+            border-top: 1px solid #e2edf2;
+            color: #6c86a3;
+        }
+
+        @media (max-width: 800px) {
+            .two-columns {
+                flex-direction: column;
+            }
+            .outline-panel {
+                position: static;
+            }
+            .q-text {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+    <div class="hero">
+        <h1>📘 无锡七年级数学（苏科版）<span>章节精讲 + 百题实战</span></h1>
+        <p>✨ 依据无锡市初中教学大纲 · 涵盖有理数、方程、不等式、几何、统计等核心模块 ✨</p>
+    </div>
+
+    <div class="two-columns">
+        <!-- 左侧: 各章节目录 + 典型例题 -->
+        <div class="outline-panel">
+            <div class="outline-header">📖 教材章节大纲 & 典型例题</div>
+            <div class="chapter-list" id="chapterList">
+                <!-- 动态js生成，方便维护 -->
+            </div>
+        </div>
+
+        <!-- 右侧: 100道测验 -->
+        <div class="quiz-panel">
+            <div class="quiz-container" id="quizRoot">
+                <div class="quiz-header">
+                    <span>🧪 百题闯关 · 随堂测验</span>
+                    <span class="stats">⭐ 得分: <span id="scoreValue">0</span> / <span id="totalScoreSpan">100</span></span>
+                </div>
+                <div class="question-area">
+                    <div class="q-text" id="questionText">加载题目中...</div>
+                    <div class="options-grid" id="optionsContainer"></div>
+                </div>
+                <div class="feedback" id="feedbackMsg">💡 选择一个选项，系统自动批阅。100道题覆盖所有章节！</div>
+                <div class="action-bar">
+                    <button id="prevBtn" class="btn-outline" style="background:#eef2ff;">◀ 上一题</button>
+                    <button id="resetBtn" class="reset-btn">🔄 重置测验</button>
+                    <button id="nextBtn" class="btn-primary">下一题 ▶</button>
+                </div>
+                <footer>📐 依据无锡七年级教学进度：有理数、一元一次方程、二元一次方程组、一元一次不等式、平行线与三角形、数据统计</footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ----------------------------- 1. 定义章节大纲（含例题）--------------------------------
+    const chaptersOutline = [
+        {
+            title: "第1章 有理数",
+            examples: [
+                { q: "例：计算 (-3) + 7 - (-2)", sol: "解：原式 = -3+7+2 = 6。 有理数加减法需统一符号。" },
+                { q: "例：| -5 | + (-2) × 3", sol: "解：=5 + (-6) = -1 。先乘除后加减。" },
+                { q: "例：比较大小 -2/3 与 -3/4", sol: "解：-2/3 ≈ -0.666, -3/4 = -0.75，因为 -0.666 > -0.75，所以 -2/3 > -3/4。" }
+            ]
+        },
+        {
+            title: "第2章 代数式与整式加减",
+            examples: [
+                { q: "例：化简 3x + 2y - x + 5y", sol: "解：合并同类项得 (3x-x) + (2y+5y) = 2x + 7y。" },
+                { q: "例：先化简再求值：2(a²b + ab) - 3(ab - a²b)，其中a=1,b=-1", sol: "解：原式=2a²b+2ab-3ab+3a²b=5a²b - ab，代入得 5×1×(-1) - 1×(-1)= -5+1=-4。" }
+            ]
+        },
+        {
+            title: "第3章 一元一次方程",
+            examples: [
+                { q: "例：解方程 3(x - 2) = 5x + 4", sol: "解：3x-6=5x+4 → -2x=10 → x=-5。" },
+                { q: "例：某数的一半比它的3倍小10，求这个数。", sol: "解：设该数为x，则 3x - 0.5x =10 → 2.5x=10 → x=4。" }
+            ]
+        },
+        {
+            title: "第4章 二元一次方程组",
+            examples: [
+                { q: "例：解方程组 { 2x+y=7, x-y=2 }", sol: "解：相加得3x=9 → x=3，代入得y=1。所以解为 x=3,y=1。" },
+                { q: "例：已知 x+y=8，且2x-y=7，求x,y。", sol: "解：两式相加得3x=15→x=5，y=3。" }
+            ]
+        },
+        {
+            title: "第5章 一元一次不等式",
+            examples: [
+                { q: "例：解不等式 2x - 5 ≤ 7，并写出正整数解。", sol: "解：2x ≤ 12 → x ≤ 6，正整数解为1,2,3,4,5,6。" },
+                { q: "例：某次知识竞赛共20题，答对一题得5分，答错扣2分，小明得分不低于70，至少答对几题？", sol: "解：设答对x题，则5x-2(20-x)≥70 → 7x≥110 → x≥15.7，至少16题。" }
+            ]
+        },
+        {
+            title: "第6章 平面图形的认识(平行线/三角形)",
+            examples: [
+                { q: "例：如图，直线a∥b，∠1=50°，则∠2的同旁内角等于多少？", sol: "解：根据平行线性质，同旁内角互补，∠2=50°，同旁内角=130°。" },
+                { q: "例：三角形两边长分别为5和7，则第三边x的取值范围。", sol: "解：三角形两边之和大于第三边，两边之差小于第三边，所以2 < x < 12。" }
+            ]
+        },
+        {
+            title: "第7章 数据的收集、整理与描述",
+            examples: [
+                { q: "例：数据 3,5,6,7,7,9 的中位数与众数。", sol: "解：排序3,5,6,7,7,9，中位数=(6+7)/2=6.5；众数=7。" },
+                { q: "例：某班50人，喜欢篮球占40%，喜欢足球占30%，绘制扇形统计图时篮球对应圆心角多少度？", sol: "解：360°×40% = 144°。" }
+            ]
+        },
+        {
+            title: "第8章 幂的运算与整式乘法(拓展)",
+            examples: [
+                { q: "例：计算 a³·a⁵ ÷ a²", sol: "解：同底数幂相乘除：a^(3+5-2)=a⁶。" },
+                { q: "例：计算 (2x²y)³", sol: "解：= 8 x⁶ y³。" }
+            ]
+        },
+        {
+            title: "第9章 二元一次方程组的应用",
+            examples: [
+                { q: "例：鸡兔同笼，头20个，腿56条，求鸡兔各几何？", sol: "解：设鸡x，兔y，x+y=20,2x+4y=56 → 解得x=12,y=8。" },
+                { q: "例：甲乙两人相距6km，相向而行1h相遇，同向而行甲3h追上乙，求甲乙速度。", sol: "解：设甲速x，乙速y，则x+y=6, 3(x-y)=6 → x=4km/h, y=2km/h。" }
+            ]
+        },
+        {
+            title: "第10章 不等式与不等式组综合",
+            examples: [
+                { q: "例：解不等式组 { 2x-1≥3, x+4<9 }，并写出整数解。", sol: "解：第一个x≥2，第二个x<5，所以2≤x<5，整数解2,3,4。" }
+            ]
+        }
+    ];
+
+    // 渲染大纲到左侧
+    function renderOutline() {
+        const container = document.getElementById('chapterList');
+        if(!container) return;
+        container.innerHTML = '';
+        chaptersOutline.forEach((ch, idx) => {
+            const card = document.createElement('div');
+            card.className = 'chapter-card';
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'chapter-title';
+            titleDiv.innerHTML = `<span>📌 ${ch.title}</span><span class="toggle-icon">▼</span>`;
+            const examplesDiv = document.createElement('div');
+            examplesDiv.className = 'examples';
+            ch.examples.forEach(ex => {
+                const exItem = document.createElement('div');
+                exItem.className = 'example-item';
+                exItem.innerHTML = `<div class="example-question">❓ ${ex.q}</div>
+                                    <div class="example-solution">🔍 ${ex.sol}</div>`;
+                examplesDiv.appendChild(exItem);
+            });
+            card.appendChild(titleDiv);
+            card.appendChild(examplesDiv);
+            titleDiv.addEventListener('click', () => {
+                examplesDiv.classList.toggle('show');
+                const icon = titleDiv.querySelector('.toggle-icon');
+                if(examplesDiv.classList.contains('show')) icon.innerHTML = '▲';
+                else icon.innerHTML = '▼';
+            });
+            container.appendChild(card);
+        });
+        // 默认展开第一个章节示例
+        const firstExamples = document.querySelectorAll('.examples')[0];
+        if(firstExamples) firstExamples.classList.add('show');
+    }
+
+    // ----------------------------- 2. 生成100道高质量贴合大纲的题库 ----------------------------
+    const TOTAL_QS = 100;
+    function generateFullBank() {
+        const bank = [];
+        // 辅助随机
+        const rand = (a,b) => Math.floor(Math.random() * (b - a + 1)) + a;
+        
+        // 1-15: 有理数计算 + 绝对值 + 数轴
+        for(let i=1;i<=15;i++) {
+            let a = rand(-20,30), b = rand(-15,25);
+            let type = rand(1,4);
+            let q = "", ans = 0;
+            if(type===1) { q = `计算: ${a} + ${b} = ?`; ans = a+b; }
+            else if(type===2) { q = `计算: ${a} - (${b}) = ?`; ans = a-b; }
+            else if(type===3) { q = `计算: ${a} × ${b} = ?`; ans = a*b; }
+            else { let bb = b===0?1:b; q = `计算: ${a} ÷ ${bb} (结果保留两位小数)`; ans = parseFloat((a/bb).toFixed(2)); }
+            let optsSet = new Set([ans]);
+            while(optsSet.size<4) optsSet.add(parseFloat((ans + rand(-5,5) + (rand(0,1)?0.5:0)).toFixed(2)));
+            let options = Array.from(optsSet);
+            let correctIdx = options.findIndex(v=>Math.abs(v-ans)<0.01);
+            bank.push({question: q, options, correctIdx, explanation: `计算结果为 ${ans}`});
+        }
+        // 16-28 一元一次方程
+        for(let i=16;i<=28;i++) {
+            let xVal = rand(-6,12);
+            let k = rand(2,5), c = rand(3,20);
+            let eq = `${k}x + ${c} = ${k*xVal + c}`;
+            let q = `解方程: ${eq}`;
+            let opts = new Set([xVal]);
+            while(opts.size<4) opts.add(xVal + rand(-3,3));
+            let options = Array.from(opts);
+            let correctIdx = options.findIndex(v=>v===xVal);
+            bank.push({question: q, options, correctIdx, explanation: `移项得 x = ${xVal}`});
+        }
+        // 29-42 二元一次方程组与代数应用
+        for(let i=29;i<=42;i++) {
+            let x = rand(1,7), y = rand(1,7);
+            let q = `方程组 { ${rand(1,3)}x + ${rand(1,3)}y = ${rand(1,3)*x+rand(1,3)*y}, ${rand(1,3)}x - ${rand(1,2)}y = ${rand(1,3)*x - rand(1,2)*y} } 则 x+y 的值是？`;
+            let correct = x+y;
+            let opts = new Set([correct]);
+            while(opts.size<4) opts.add(correct+rand(-2,2));
+            let options = Array.from(opts);
+            let correctIdx = options.findIndex(v=>v===correct);
+            bank.push({question: q, options, correctIdx, explanation: `解得 x=${x},y=${y}，和=${correct}`});
+        }
+        // 43-55 不等式与不等式组
+        for(let i=43;i<=55;i++) {
+            let sol = rand(2,10);
+            let q = `不等式 2x - 5 ≤ ${2*sol-5} 的最大整数解是？`;
+            let correct = sol;
+            let opts = new Set([correct, correct-1, correct+1, correct-2]);
+            let options = Array.from(opts).sort((a,b)=>a-b);
+            let correctIdx = options.findIndex(v=>v===correct);
+            bank.push({question: q, options, correctIdx, explanation: `解集为 x ≤ ${sol}，最大整数是 ${sol}`});
+        }
+        // 56-70 平行线与三角形角度
+        let angles = [30,45,60,70,80,100,120];
+        for(let i=56;i<=70;i++) {
+            let angleA = angles[rand(0,angles.length-1)];
+            let q = `已知直线a∥b，∠1 = ${angleA}°，则∠1的同位角等于多少度？`;
+            let correct = angleA;
+            let opts = new Set([correct, correct+rand(15,40), correct>20?correct-20:correct+20, correct+rand(5,30)]);
+            let options = Array.from(opts);
+            let correctIdx = options.findIndex(v=>v===correct);
+            bank.push({question: q, options, correctIdx, explanation: `平行线同位角相等，所以∠2 = ${correct}°`});
+        }
+        // 71-80 数据与统计
+        let rawData = [[2,4,5,6,7,8,8],[12,15,18,18,20],[3,5,7,9,11,13],[5,7,9,9,11]];
+        for(let i=71;i<=80;i++) {
+            let data = rawData[rand(0,rawData.length-1)];
+            let sum = data.reduce((a,b)=>a+b,0);
+            let mean = sum/data.length;
+            let q = `数据 ${data.join(',')} 的平均数（保留一位小数）是？`;
+            let correct = parseFloat(mean.toFixed(1));
+            let opts = new Set([correct, correct+rand(1,3), correct>2?correct-1.5:correct+1.5, correct+rand(0,2)+0.5]);
+            let options = Array.from(opts).map(v=>parseFloat(v.toFixed(1)));
+            let correctIdx = options.findIndex(v=>Math.abs(v-correct)<0.05);
+            bank.push({question: q, options, correctIdx, explanation: `平均数 = ${correct}`});
+        }
+        // 81-90 实际应用（行程/工程/利润）
+        for(let i=81;i<=90;i++) {
+            let speed = rand(45,75);
+            let time = rand(2,4);
+            let total = speed * time + rand(15,40);
+            let q = `一辆汽车以 ${speed} km/h 行驶 ${time} 小时，又行驶了 ${total - speed*time} km 到达目的地，总路程为？`;
+            let correct = total;
+            let opts = new Set([correct, correct+rand(8,20), correct>15?correct-10:correct+10, correct+rand(4,12)]);
+            let options = Array.from(opts);
+            let correctIdx = options.findIndex(v=>v===correct);
+            bank.push({question: q, options, correctIdx, explanation: `总路程 = ${speed}×${time} + ${total-speed*time} = ${correct} km`});
+        }
+        // 91-100 综合（幂运算、平面直角坐标系、三角形三边关系等）
+        for(let i=91;i<=100;i++) {
+            let sub = rand(1,3);
+            if(sub===1) {
+                let x = rand(-4,4), y = rand(-4,4);
+                let quad = "";
+                if(x>0 && y>0) quad="第一象限"; else if(x<0 && y>0) quad="第二象限"; else if(x<0 && y<0) quad="第三象限"; else quad="第四象限";
+                let q = `点 P(${x},${y}) 位于哪个象限？`;
+                let opts = ["第一象限","第二象限","第三象限","第四象限"];
+                let correctIdx = opts.indexOf(quad);
+                bank.push({question: q, options: opts, correctIdx, explanation: `根据坐标符号，点在${quad}`});
+            } else if(sub===2) {
+                let a = rand(2,6), b = rand(3,8);
+                let q = `计算: a³·a⁴ ÷ a² (a≠0) 的结果是？ (用幂表示)`;
+                let correctExp = `a⁵`;
+                let opts = ["a⁵", "a⁶", "a⁷", "a⁹"];
+                let correctIdx = opts.indexOf(correctExp);
+                bank.push({question: q, options: opts, correctIdx, explanation: `指数运算 3+4-2=5，得 a⁵`});
+            } else {
+                let side1 = rand(3,8), side2 = rand(4,9);
+                let q = `三角形两边长分别为 ${side1} 和 ${side2}，则第三边长不可能为？ (选择不可能的)`;
+                let maxPossible = side1+side2-1;
+                let minPossible = Math.abs(side1-side2)+1;
+                let impossible = minPossible-1 > 0 ? minPossible-1 : maxPossible+2;
+                let opts = [impossible, minPossible, maxPossible, (minPossible+maxPossible)/2 |0];
+                let correctIdx = 0;
+                bank.push({question: q, options: opts, correctIdx, explanation: `三角形两边之和大于第三边，两边之差小于第三边，${impossible} 不在范围内`});
+            }
+        }
+        while(bank.length > TOTAL_QS) bank.pop();
+        while(bank.length < TOTAL_QS) bank.push({question: `若 |x-2|+(y+3)²=0，则 x+y=？`, options: [-1,1,5,-5], correctIdx:0, explanation: `x=2,y=-3,和为-1`});
+        return bank.slice(0,TOTAL_QS);
+    }
+
+    // 全局quiz状态
+    let questions = [];
+    let userAnswers = new Array(TOTAL_QS).fill(null);
+    let answerStatus = new Array(TOTAL_QS).fill(false);
+    let currentIndex = 0;
+    let score = 0;
+    
+    // DOM
+    const questionTextDiv = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const scoreSpan = document.getElementById('scoreValue');
+    const totalScoreSpan = document.getElementById('totalScoreSpan');
+    const feedbackDiv = document.getElementById('feedbackMsg');
+    
+    function recalcScore() {
+        let correctCount = answerStatus.filter(v=>v===true).length;
+        score = correctCount;
+        scoreSpan.innerText = score;
+        totalScoreSpan.innerText = TOTAL_QS;
+    }
+    
+    function renderCurrentQuestion() {
+        const q = questions[currentIndex];
+        if(!q) return;
+        questionTextDiv.innerText = `${currentIndex+1}. ${q.question}`;
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn';
+            const prefixSpan = document.createElement('span');
+            prefixSpan.className = 'opt-prefix';
+            prefixSpan.innerText = String.fromCharCode(65+idx);
+            const textSpan = document.createElement('span');
+            textSpan.innerText = ` ${opt}`;
+            btn.appendChild(prefixSpan);
+            btn.appendChild(textSpan);
+            if(userAnswers[currentIndex] !== null) {
+                btn.classList.add('disabled-opt');
+                if(userAnswers[currentIndex] === idx && idx === q.correctIdx) btn.classList.add('selected-correct');
+                else if(userAnswers[currentIndex] === idx && idx !== q.correctIdx) btn.classList.add('selected-wrong');
+                else if(idx === q.correctIdx) btn.style.backgroundColor = "#e2f3e4";
+            } else {
+                btn.addEventListener('click', ()=>{
+                    if(userAnswers[currentIndex] !== null) return;
+                    userAnswers[currentIndex] = idx;
+                    answerStatus[currentIndex] = (idx === q.correctIdx);
+                    recalcScore();
+                    renderCurrentQuestion();
+                    if(answerStatus[currentIndex]) feedbackDiv.innerHTML = `✅ 正确！ ${q.explanation}`;
+                    else feedbackDiv.innerHTML = `❌ 错误！ 正确答案是 ${q.options[q.correctIdx]}。${q.explanation}`;
+                });
+            }
+            optionsContainer.appendChild(btn);
+        });
+        if(userAnswers[currentIndex] === null) feedbackDiv.innerHTML = `📌 第${currentIndex+1}题 / 共100题，选择一个选项。`;
+        else if(answerStatus[currentIndex]) feedbackDiv.innerHTML = `✅ 已正确: ${questions[currentIndex].explanation}`;
+        else feedbackDiv.innerHTML = `⚠️ 本题答案错误，正确选项 ${questions[currentIndex].options[questions[currentIndex].correctIdx]}。${questions[currentIndex].explanation}`;
+    }
+    
+    function goPrev() { if(currentIndex>0) {currentIndex--; renderCurrentQuestion();} else feedbackDiv.innerHTML="已在第一题";}
+    function goNext() { if(currentIndex<TOTAL_QS-1) {currentIndex++; renderCurrentQuestion();} else feedbackDiv.innerHTML = "🎉 已是最后一题，完成全部100道可重置再练。";}
+    function resetQuiz() { userAnswers.fill(null); answerStatus.fill(false); currentIndex=0; recalcScore(); renderCurrentQuestion(); feedbackDiv.innerHTML="🔄 已重置，重新挑战100道题！"; }
+    
+    function initQuiz() {
+        questions = generateFullBank();
+        userAnswers = new Array(TOTAL_QS).fill(null);
+        answerStatus = new Array(TOTAL_QS).fill(false);
+        currentIndex = 0;
+        recalcScore();
+        renderCurrentQuestion();
+        prevBtn.addEventListener('click', goPrev);
+        nextBtn.addEventListener('click', goNext);
+        resetBtn.addEventListener('click', resetQuiz);
+    }
+    
+    // 初始化大纲和测验
+    renderOutline();
+    initQuiz();
+</script>
+</body>
+</html>
